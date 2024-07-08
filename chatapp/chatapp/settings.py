@@ -32,9 +32,9 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
     'chat',
     'accounts',
+    'channels',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
