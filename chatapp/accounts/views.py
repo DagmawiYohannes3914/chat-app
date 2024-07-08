@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -45,3 +45,15 @@ class LoginView(generics.GenericAPIView):
             })
         print("Invalid credentials")
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserSearchView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        query = request.query_params.get('query', '')
+        users = User.objects.filter(
+            username_icontains=query) | User.objects.filter(email_icontains=query)
+        results = [{'id': user.id, 'username': user.username,
+                    'email': user.email} for user in users]
+        return Response(results)
