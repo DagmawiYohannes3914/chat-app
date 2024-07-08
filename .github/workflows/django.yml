@@ -27,4 +27,4 @@ jobs:
         pip install -r chatapp/requirements.txt
     - name: Run Tests
       run: |
-        python manage.py test
+        python chatapp/manage.py test
