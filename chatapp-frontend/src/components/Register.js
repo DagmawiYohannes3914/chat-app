@@ -1,54 +1,77 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState } from 'react';
+import axios from 'axios';
 
 const Register = () => {
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [buttonClicked, setButtonClicked] = useState(false);
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/accounts/register/",
-        {
-          username,
-          email,
-          password,
-        }
-      );
-      setMessage(`User registered with token: ${response.data.token}`);
+      setButtonClicked(true);
+      const response = await axios.post('http://localhost:8000/api/accounts/register/', { username, password, email });
+      setMessage(`User registered Successfully`);
+
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      console.log(response.data);
     } catch (error) {
       setMessage("Registration failed");
+      console.error('Registration failed:', error);
     }
   };
 
   return (
-    <div>
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">Register</button>
-      </form>
-      <p>{message}</p>
+    <div className="min-h-screen bg-blue-100 flex items-center justify-center">
+      <div className="bg-white p-8 rounded shadow-md w-96">
+        <h1 className="text-2xl font-bold mb-6 text-center text-blue-700">Register</h1>
+        <form onSubmit={handleRegister}>
+          <div className="mb-4">
+            <label className="block text-gray-700">Username</label>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded mt-1"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Email</label>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded mt-1"
+            />
+          </div>
+          <div className="mb-4">
+            <label className="block text-gray-700">Password</label>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full p-2 border border-gray-300 rounded mt-1"
+            />
+          </div>
+          <div>
+            <button
+            type="submit"
+            className={`w-full p-2 rounded mt-4 ${buttonClicked ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}
+            disabled={buttonClicked} // Disable button after clicking
+          >
+            {buttonClicked ? 'Registered!' : 'Register'}
+          </button>
+          </div>
+        </form>
+        <p>{message}</p>
+      </div>
     </div>
   );
 };
