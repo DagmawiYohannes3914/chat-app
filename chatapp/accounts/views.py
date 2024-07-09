@@ -1,8 +1,9 @@
 from rest_framework import generics, status, permissions
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import authenticate
 from .serializers import UserSerializer
 
@@ -45,6 +46,12 @@ class LoginView(generics.GenericAPIView):
             })
         print("Invalid credentials")
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserListView(generics.ListAPIView):
+    query = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class UserSearchView(generics.ListAPIView):
