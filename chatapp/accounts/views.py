@@ -64,18 +64,19 @@ class LogoutView(APIView):
 
 
 class UserListView(generics.ListAPIView):
-    query = User.objects.all()
+    queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
 
 class UserSearchView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
 
     def get(self, request, *args, **kwargs):
         query = request.query_params.get('query', '')
         users = User.objects.filter(
-            username_icontains=query) | User.objects.filter(email_icontains=query)
+            username__icontains=query) | User.objects.filter(email__icontains=query)
         results = [{'id': user.id, 'username': user.username,
                     'email': user.email} for user in users]
         return Response(results)
