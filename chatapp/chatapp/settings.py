@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-5^tp*yack165&pi6l02t$*_ts+r+=3jz$621=82rrf=@1u5%8t
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 
 # Application definition
@@ -138,6 +138,8 @@ AUTH_USER_MODEL = 'accounts.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # React frontend
+    "http://localhost:3121",
+    "http://localhost:6018",
 ]
 
 REST_FRAMEWORK = {
@@ -168,11 +170,12 @@ DATABASES = {
 }
 
 
-ASGI_APPLICATION = 'chat_app.asgi.application'
+ASGI_APPLICATION = 'chatapp.asgi.application'
 
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
         'CONFIG': {
             "hosts": [('127.0.0.1', 6380)],
         },
