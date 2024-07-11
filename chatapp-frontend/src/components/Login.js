@@ -12,10 +12,12 @@ const Login = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8000/api/accounts/login/', { username, password });
+      localStorage.setItem('access_token', response.data.access);
+      localStorage.setItem('refresh_token', response.data.refresh);
       console.log(response.data);
       navigate('/home');
     } catch (error) {
-      setMessage(`Login failed: ${error.response ? error.response.data : error.message}`)
+      setMessage(`Login failed: ${error.response ? error.response.data : error.message}`);
       console.error('Login failed:', error);
     }
   };

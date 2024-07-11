@@ -10,7 +10,11 @@ const Home = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/accounts/');
+        const response = await axios.get('http://localhost:8000/api/accounts/', {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        });
         setUsers(response.data);
       } catch (error) {
         console.error('Error fetching users:', error);
@@ -19,9 +23,23 @@ const Home = () => {
     fetchUsers();
   }, []);
 
-  const handleSearch = (e) => {
-    setSearch(e.target.value);
-  };
+  useEffect(() => {
+    const fetchSearchResults = async () => {
+      if (search) {
+        try {
+          const response = await axios.get(`http://localhost:8000/api/accounts/search/?query=${search}`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+            },
+          });
+          setUsers(response.data);
+        } catch (error) {
+          console.error('Error searching users:', error);
+        }
+      }
+    };
+    fetchSearchResults();
+  }, [search]);
 
   return (
     <div className="min-h-screen bg-purple-100 p-8">
@@ -30,17 +48,18 @@ const Home = () => {
         <input
           type="text"
           value={search}
-          onChange={handleSearch}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search for users"
           className="w-full p-2 border border-gray-300 rounded mb-6"
         />
         <ul>
-          {users.filter(user => user.username.includes(search)).map(user => (
+          {users.map(user => (
             <li key={user.id} className="mb-4 p-4 bg-gray-100 rounded cursor-pointer" onClick={() => navigate(`/chat/${user.id}`)}>
               {user.username}
             </li>
           ))}
         </ul>
+        <button onClick={() => navigate('/chat/new')} className="w-full bg-purple-500 text-white p-2 rounded mt-4">Compose New Message</button>
       </div>
     </div>
   );

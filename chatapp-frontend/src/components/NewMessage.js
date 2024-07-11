@@ -1,13 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import useWebSocket from 'react-use-websocket';
 
 const NewMessage = () => {
   const [users, setUsers] = useState([]);
   const [recipient, setRecipient] = useState('');
   const [message, setMessage] = useState('');
+  const [socketUrl, setSocketUrl] = useState(null);
   const navigate = useNavigate();
-  const socketRef = useRef(null);
+
+  const { sendMessage } = useWebSocket(socketUrl, {
+    onOpen: () => console.log('WebSocket connection established'),
+    onClose: () => console.log('WebSocket connection closed'),
+    onError: (error) => console.error('WebSocket error:', error),
+    onMessage: (event) => {
+      const data = JSON.parse(event.data);
+      console.log('Received message:', data.message);
+    },
+  });
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -27,32 +38,7 @@ const NewMessage = () => {
 
   useEffect(() => {
     if (recipient) {
-      // Establish WebSocket connection when a recipient is selected
-      socketRef.current = new WebSocket(`ws://localhost:8000/ws/chat/${recipient}/`);
-
-      socketRef.current.onopen = () => {
-        console.log("WebSocket connection established");
-      };
-
-      socketRef.current.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        console.log("Received message:", data.message);
-      };
-
-      socketRef.current.onclose = () => {
-        console.log("WebSocket connection closed");
-      };
-
-      socketRef.current.onerror = (error) => {
-        console.error("WebSocket error:", error);
-      };
-
-      // Clean up the WebSocket connection when the component unmounts or recipient changes
-      return () => {
-        if (socketRef.current) {
-          socketRef.current.close();
-        }
-      };
+      setSocketUrl(`ws://localhost:8000/ws/chat/${recipient}/`);
     }
   }, [recipient]);
 
@@ -70,9 +56,7 @@ const NewMessage = () => {
       console.log(response.data);
       
       // Send message through WebSocket
-      if (socketRef.current) {
-        socketRef.current.send(JSON.stringify({ message }));
-      }
+      sendMessage(JSON.stringify({ message }));
       
       navigate(`/chat/${recipient}`);
     } catch (error) {
