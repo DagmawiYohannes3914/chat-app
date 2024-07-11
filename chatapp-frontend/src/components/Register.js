@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
   const [username, setUsername] = useState('');
@@ -7,20 +8,22 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [buttonClicked, setButtonClicked] = useState(false);
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
       setButtonClicked(true);
       const response = await axios.post('http://localhost:8000/api/accounts/register/', { username, password, email });
-      setMessage(`User registered Successfully`);
+      setMessage('User registered successfully');
 
       setUsername('');
       setEmail('');
       setPassword('');
       console.log(response.data);
+      setTimeout(() => navigate('/login'), 2000); // Redirect after 2 seconds
     } catch (error) {
-      setMessage("Registration failed");
+      setMessage('Registration failed');
       console.error('Registration failed:', error);
     }
   };
@@ -62,12 +65,12 @@ const Register = () => {
           </div>
           <div>
             <button
-            type="submit"
-            className={`w-full p-2 rounded mt-4 ${buttonClicked ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}
-            disabled={buttonClicked} // Disable button after clicking
-          >
-            {buttonClicked ? 'Registered!' : 'Register'}
-          </button>
+              type="submit"
+              className={`w-full p-2 rounded mt-4 ${buttonClicked ? 'bg-green-500 text-white' : 'bg-blue-500 text-white'}`}
+              disabled={buttonClicked}
+            >
+              {buttonClicked ? 'Registered!' : 'Register'}
+            </button>
           </div>
         </form>
         <p>{message}</p>
