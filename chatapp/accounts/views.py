@@ -1,6 +1,5 @@
-from rest_framework import generics, status, permissions
+from rest_framework import generics, status, permissions, viewsets
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
@@ -35,18 +34,13 @@ class LoginView(generics.GenericAPIView):
         username = request.data.get('username')
         password = request.data.get('password')
 
-        print(f"Username: {username}, Password: {password}")
-
         user = authenticate(username=username, password=password)
-        print(f"Authenticated User: {user}")
         if user is not None:
             refresh = RefreshToken.for_user(user)
-            print(f"User authenticated: {user}")
             return Response({
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             })
-        print("Invalid credentials")
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -63,7 +57,7 @@ class LogoutView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UserListView(generics.ListAPIView):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
