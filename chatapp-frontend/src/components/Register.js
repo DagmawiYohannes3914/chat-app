@@ -14,7 +14,7 @@ const Register = () => {
     e.preventDefault();
     try {
       setButtonClicked(true);
-      const response = await axios.post('http://localhost:8000/api/accounts/register/', { username, password, email });
+      const response = await axios.post('http://localhost:8000/api/accounts/api/register/', { username, password, email });
       setMessage('User registered successfully');
 
       setUsername('');
