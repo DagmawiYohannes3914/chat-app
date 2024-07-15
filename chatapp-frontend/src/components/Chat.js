@@ -8,6 +8,10 @@ const Chat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [file, setFile] = useState(null);
+  const [chatUser, setChatUser] = useState(null);
+
+  // Retrieve the authenticated user's ID from local storage
+  const senderId = localStorage.getItem('user_id');
 
   const { sendMessage } = useWebSocket(`ws://localhost:8000/ws/chat/${userId}/`, {
     onOpen: () => console.log('WebSocket connection established'),
@@ -34,12 +38,26 @@ const Chat = () => {
       }
     };
 
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8000/api/users/${userId}/`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
+          },
+        });
+        setChatUser(response.data);
+      } catch (error) {
+        console.error('Error fetching user:', error);
+      }
+    };
+
     fetchMessages();
+    fetchUser();
   }, [userId]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    const newMessage = { content: message, sender: 1, receiver: userId }; // Update sender ID appropriately
+    const newMessage = { content: message, sender: senderId, receiver: userId };
     sendMessage(JSON.stringify({ message: newMessage }));
     setMessage('');
 
@@ -63,10 +81,10 @@ const Chat = () => {
   return (
     <div className="min-h-screen bg-yellow-100 p-8">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded shadow-md">
-        <h1 className="text-2xl font-bold mb-6 text-center text-yellow-700">Chat</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center text-yellow-700">Chat with {chatUser?.username}</h1>
         <div className="mb-6 h-96 overflow-y-auto">
           {messages.map((msg, index) => (
-            <div key={index} className={`p-2 mb-2 ${msg.sender === 1 ? 'bg-blue-100 text-right' : 'bg-gray-100'} rounded`}>
+            <div key={index} className={`p-2 mb-2 ${msg.sender === senderId ? 'bg-blue-100 text-right' : 'bg-gray-100'} rounded`}>
               {msg.content}
             </div>
           ))}
