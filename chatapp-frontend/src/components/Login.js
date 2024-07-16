@@ -1,36 +1,38 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/token/', {
+      const response = await axios.post('http://localhost:8000/api/accounts/login/', {
         username,
         password,
       });
+      console.log('Login response:', response.data);
       
       localStorage.setItem('access_token', response.data.access);
       localStorage.setItem('refresh_token', response.data.refresh);
 
       // Fetch user details with the token
-      const userResponse = await axios.get('http://localhost:8000/api/users/me/', {
-        headers: {
-          Authorization: `Bearer ${response.data.access}`,
-        },
-      });
+      // const userResponse = await axios.get('http://localhost:8000/api/accounts/users/me/', {
+      //       headers: {
+      //           Authorization: `Bearer ${response.data.access}`,
+      //       },
+      //   });
+      //    console.log('User response:', userResponse.data);
 
       // Store user ID in localStorage
-      localStorage.setItem('user_id', userResponse.data.id);
+      localStorage.setItem('user_id', response.data.id);
 
       // Redirect to chat page or home page
-      history.push('/chat');
+      navigate('/home');
     } catch (error) {
       setError('Login failed. Please check your credentials and try again.');
     }
