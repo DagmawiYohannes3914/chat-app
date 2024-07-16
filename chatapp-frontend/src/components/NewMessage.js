@@ -23,7 +23,7 @@ const NewMessage = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/accounts/api/users', {
+        const response = await axios.get('http://localhost:8000/api/accounts/users', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access_token')}`,
           },

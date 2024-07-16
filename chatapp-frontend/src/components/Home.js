@@ -10,7 +10,7 @@ const Home = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/accounts/api/users', {
+        const response = await axios.get('http://localhost:8000/api/accounts/users', {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('access_token')}`,
           },
@@ -27,7 +27,7 @@ const Home = () => {
     const fetchSearchResults = async () => {
       if (search) {
         try {
-          const response = await axios.get(`http://localhost:8000/api/accounts/api/search/?query=${search}`, {
+          const response = await axios.get(`http://localhost:8000/api/accounts/search/?query=${search}`, {
             headers: {
               Authorization: `Bearer ${localStorage.getItem('access_token')}`,
             },
