@@ -5,15 +5,11 @@ from rest_framework.permissions import IsAuthenticated
 from .models import Message
 from .serializers import MessageSerializer
 import logging
+from django.contrib.auth import get_user_model
 
 logger = logging.getLogger(__name__)
 
-
-# @api_view(['GET'])
-# def get_user(request):
-#     permission_classes = [IsAuthenticated]
-#     user = request.user
-#     return Response({'id': user.id, 'username': user.username})
+User = get_user_model()
 
 
 class MessageViewSet(viewsets.ModelViewSet):
