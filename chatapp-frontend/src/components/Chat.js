@@ -1,23 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import useWebSocket from 'react-use-websocket';
 import axios from 'axios';
 import { useParams } from 'react-router-dom';
+import { MessageContext } from '../contexts/MessageContext';
 
 const Chat = () => {
   const { userId } = useParams();
-  const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState('');
   const [file, setFile] = useState(null);
   const [chatUser, setChatUser] = useState(null);
-
-  // Retrieve the authenticated user's ID from local storage
-  const senderId = localStorage.getItem('user_id');
+  const { messages, addMessage } = useContext(MessageContext);
 
   const { sendMessage } = useWebSocket(`ws://localhost:8000/ws/chat/${userId}/`, {
     onOpen: () => console.log('WebSocket connection established'),
     onMessage: (event) => {
       const data = JSON.parse(event.data);
-      setMessages((prevMessages) => [...prevMessages, data.message]);
+      addMessage(data.message);
     },
     onClose: () => console.log('WebSocket connection closed'),
     onError: (error) => console.error('WebSocket error:', error),
@@ -32,7 +30,8 @@ const Chat = () => {
             Authorization: `Bearer ${localStorage.getItem('access_token')}`,
           },
         });
-        setMessages(response.data);
+        response.data.forEach((msg) => addMessage(msg));
+        // addMessage(response.data)
       } catch (error) {
         console.error('Error fetching messages:', error);
       }
@@ -53,11 +52,11 @@ const Chat = () => {
 
     fetchMessages();
     fetchUser();
-  }, [userId]);
+  }, [userId, addMessage]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    const newMessage = { content: message, sender: senderId, receiver: userId };
+    const newMessage = { content: message, sender: localStorage.getItem('user_id'), receiver: userId };
     sendMessage(JSON.stringify({ message: newMessage }));
     setMessage('');
 
@@ -84,7 +83,7 @@ const Chat = () => {
         <h1 className="text-2xl font-bold mb-6 text-center text-yellow-700">Chat with {chatUser?.username}</h1>
         <div className="mb-6 h-96 overflow-y-auto">
           {messages.map((msg, index) => (
-            <div key={index} className={`p-2 mb-2 ${msg.sender === senderId ? 'bg-blue-100 text-right' : 'bg-gray-100'} rounded`}>
+            <div key={index} className={`p-2 mb-2 ${msg.sender === localStorage.getItem('user_id') ? 'bg-blue-100 text-right' : 'bg-gray-100'} rounded`}>
               {msg.content}
             </div>
           ))}

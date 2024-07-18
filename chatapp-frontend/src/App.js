@@ -1,18 +1,23 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Register from './components/Register';
 import Login from './components/Login';
 import Home from './components/Home';
 import Chat from './components/Chat';
 import NewMessage from './components/NewMessage';
-import Navbar from './components/Navbar'; // Add this import
+import Navbar from './components/Navbar';
+import { AuthContext } from './contexts/AuthContext';
 
 const App = () => {
-  const isAuthenticated = !!localStorage.getItem('access_token');
+  const { isAuthenticated, checkAuth } = useContext(AuthContext);
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
 
   return (
     <>
-      <Navbar /> {/* Add Navbar here */}
+      <Navbar />
       <Routes>
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />

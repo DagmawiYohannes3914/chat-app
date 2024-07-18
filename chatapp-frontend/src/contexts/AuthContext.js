@@ -20,6 +20,7 @@ const AuthProvider = ({ children }) => {
     const response = await axios.post('http://localhost:8000/api/accounts/login/', credentials);
     localStorage.setItem('access_token', response.data.access);
     localStorage.setItem('refresh_token', response.data.refresh);
+    // localStorage.setItem('user_id', response.data.id);
     axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
     setIsAuthenticated(true);
   };
@@ -27,6 +28,7 @@ const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
+    // localStorage.removeItem('user_id')
     delete axios.defaults.headers.common['Authorization'];
     setIsAuthenticated(false);
   };

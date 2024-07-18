@@ -1,70 +1,51 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:8000/api/accounts/login/', {
-        username,
-        password,
-      });
-      console.log('Login response:', response.data);
-      
-      localStorage.setItem('access_token', response.data.access);
-      localStorage.setItem('refresh_token', response.data.refresh);
-
-      // Fetch user details with the token
-      // const userResponse = await axios.get('http://localhost:8000/api/accounts/users/me/', {
-      //       headers: {
-      //           Authorization: `Bearer ${response.data.access}`,
-      //       },
-      //   });
-      //    console.log('User response:', userResponse.data);
-
-      // Store user ID in localStorage
-      localStorage.setItem('user_id', response.data.id);
-
-      // Redirect to chat page or home page
+      await login({ username, password });
       navigate('/home');
-    } catch (error) {
+    } catch (err) {
       setError('Login failed. Please check your credentials and try again.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-yellow-100 p-8 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white p-6 rounded shadow-md">
-        <h1 className="text-2xl font-bold mb-6 text-center text-yellow-700">Login</h1>
-        {error && <div className="mb-4 text-red-500">{error}</div>}
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+      <div className="max-w-md w-full bg-white p-8 shadow-md rounded">
+        <h1 className="text-2xl font-bold mb-6 text-center">Login</h1>
+        {error && <div className="bg-red-200 p-4 rounded mb-4 text-red-700">{error}</div>}
         <form onSubmit={handleLogin}>
           <div className="mb-4">
-            <label className="block text-gray-700">Username</label>
+            <label className="block mb-1 font-bold">Username</label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Password</label>
+            <label className="block mb-1 font-bold">Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded mt-1"
+              className="w-full p-2 border border-gray-300 rounded"
               required
             />
           </div>
-          <button type="submit" className="w-full bg-yellow-500 text-white p-2 rounded">Login</button>
+          <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded">Login</button>
         </form>
       </div>
     </div>
